@@ -3,7 +3,7 @@
     android:fillAfter="true">
     <translate
         android:interpolator="@android:interpolator/bounce"
-        android:fromXDelta="-30"
+        android:fromXDelta="-50"
         android:fromYDelta="50"
         android:toYDelta="0"
         android:toXDelta="0"
