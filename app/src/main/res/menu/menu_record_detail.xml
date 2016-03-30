@@ -1,0 +1,20 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".Activities.MainActivity">
+    <item
+        android:id="@+id/action_stat_view"
+        android:orderInCategory="100"
+        android:title="Statistic View"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_text_view"
+        android:orderInCategory="100"
+        android:title="Text View"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_graph_view"
+        android:orderInCategory="100"
+        android:title="Graph View"
+        app:showAsAction="never" />
+</menu>

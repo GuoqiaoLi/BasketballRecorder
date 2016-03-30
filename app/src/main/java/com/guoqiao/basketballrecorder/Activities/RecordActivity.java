@@ -11,21 +11,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.SimpleAdapter;
-import android.widget.Toast;
 
 import com.guoqiao.basketballrecorder.Adapter.RecordsAdapter;
 import com.guoqiao.basketballrecorder.Beans.RecordBean;
 import com.guoqiao.basketballrecorder.Beans.SingleRecordBean;
 import com.guoqiao.basketballrecorder.R;
+import com.guoqiao.basketballrecorder.Utils.AnimationUtil;
 import com.guoqiao.basketballrecorder.Utils.Constant;
 import com.guoqiao.basketballrecorder.Utils.FileUtil;
 
@@ -35,6 +32,22 @@ public class RecordActivity extends AppCompatActivity {
     private String player;
     private String teamOneName;
     private String teamTwoName;
+
+    private int threePointScored = 0;
+    private int threePointMissed = 0;
+    private int twoPointScored = 0;
+    private int twoPointMissed = 0;
+    private int freeThrowScored = 0;
+    private int freeThrowMissed = 0;
+    private int rebound = 0;
+    private int steal = 0;
+    private int assist = 0;
+
+    private ImageView functionBtn;
+    private ImageView stealBtn;
+    private ImageView reboundBtn;
+    private ImageView assistBtn;
+    private boolean extraFunctionShow = false;
 
     private boolean flag = false;
     private RelativeLayout basketballCourtWrapper;
@@ -94,8 +107,14 @@ public class RecordActivity extends AppCompatActivity {
         scoreBtn.setClickable(true);
         missBtn.setClickable(true);
 
+        functionBtn = (ImageView) findViewById(R.id.extra_function);
+        stealBtn = (ImageView) findViewById(R.id.function_steal);
+        assistBtn = (ImageView) findViewById(R.id.function_assist);
+        reboundBtn = (ImageView) findViewById(R.id.function_rebound);
+
         courtOnTouch();
         functionBtnOnClick();
+        extraFunctionBtnOnClick();
 
         singleRecordBeans = new ArrayList<>();
         recordsListView = (ListView) findViewById(R.id.records);
@@ -109,22 +128,21 @@ public class RecordActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String description;
+                int tag;
+
                 // if it's a three point or two point
                 if(threePoint()){
                     description = Constant.THREE_POINT_SCORE_DESCRIPTION;
+                    tag = Constant.THREE_POINT;
+                    threePointScored++;
                 }
                 else{
                     description = Constant.TWO_POINT_SCORE_DESCRIPTION;
+                    tag = Constant.TWO_POINT;
+                    twoPointScored++;
                 }
 
-                // store to singleRecordBeans
-                SingleRecordBean singleRecordBean = new SingleRecordBean();
-                singleRecordBean.setX(x);
-                singleRecordBean.setY(y);
-                singleRecordBean.setScored(true);
-                singleRecordBean.setTag(Constant.THREE_POINT);
-                singleRecordBean.setDescription(description);
-                singleRecordBeans.add(singleRecordBean);
+                addSingleRecord(true, tag, description);
 
                 records.add(description);
                 adapter.notifyDataSetChanged();
@@ -139,22 +157,21 @@ public class RecordActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String description;
+                int tag;
+
                 // if it's a three point or two point
                 if(threePoint()){
                     description = Constant.THREE_POINT_MISS_DESCRIPTION;
+                    tag = Constant.THREE_POINT;
+                    threePointMissed++;
                 }
                 else{
                     description = Constant.TWO_POINT_MISS_DESCRIPTION;
+                    tag = Constant.TWO_POINT;
+                    twoPointMissed++;
                 }
 
-                // store to singleRecordBeans
-                SingleRecordBean singleRecordBean = new SingleRecordBean();
-                singleRecordBean.setX(x);
-                singleRecordBean.setY(y);
-                singleRecordBean.setScored(false);
-                singleRecordBean.setTag(Constant.THREE_POINT);
-                singleRecordBean.setDescription(description);
-                singleRecordBeans.add(singleRecordBean);
+                addSingleRecord(true, tag, description);
 
                 records.add(description);
                 adapter.notifyDataSetChanged();
@@ -162,6 +179,59 @@ public class RecordActivity extends AppCompatActivity {
                 basketballCourtWrapper.removeView(scoreBtn);
                 basketballCourtWrapper.removeView(missBtn);
                 flag = false;
+            }
+        });
+
+        stealBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                steal++;
+                records.add(Constant.STEAL_DESCRIPTION);
+                adapter.notifyDataSetChanged();
+                addSingleRecord(false, Constant.STEAL, Constant.STEAL_DESCRIPTION);
+                hideExtraFunctionBtns();
+            }
+        });
+
+        reboundBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rebound++;
+                records.add(Constant.REBOUND_DESCRIPTION);
+                adapter.notifyDataSetChanged();
+                addSingleRecord(false, Constant.REBOUND, Constant.REBOUND_DESCRIPTION);
+                hideExtraFunctionBtns();
+            }
+        });
+
+        assistBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                assist++;
+                records.add(Constant.ASSIST_DESCRIPTION);
+                adapter.notifyDataSetChanged();
+                addSingleRecord(false, Constant.ASSIST, Constant.ASSIST_DESCRIPTION);
+                hideExtraFunctionBtns();
+            }
+        });
+    }
+
+
+    public void extraFunctionBtnOnClick(){
+        functionBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // if extra function btns not shown, show btns
+                if(!extraFunctionShow){
+                    AnimationUtil.startUpShowAnimation(RecordActivity.this, assistBtn);
+                    AnimationUtil.startLeftShowAnimation(RecordActivity.this, reboundBtn);
+                    AnimationUtil.startUpLeftShowAnimation(RecordActivity.this, stealBtn);
+
+                    extraFunctionShow = true;
+                }
+                else{
+                    hideExtraFunctionBtns();
+                }
             }
         });
     }
@@ -185,7 +255,7 @@ public class RecordActivity extends AppCompatActivity {
 
                         // add circle button
                         RelativeLayout.LayoutParams paramsOne = new RelativeLayout.LayoutParams(50, 50);
-                        paramsOne.setMargins(x - 50, y - 80, 0, 0);
+                        paramsOne.setMargins(x - 100, y - 80, 0, 0);
                         RelativeLayout.LayoutParams paramsTwo = new RelativeLayout.LayoutParams(50, 50);
                         paramsTwo.setMargins(x + 50, y - 80, 0, 0);
 
@@ -195,12 +265,9 @@ public class RecordActivity extends AppCompatActivity {
                         basketballCourtWrapper.addView(scoreBtn);
                         basketballCourtWrapper.addView(missBtn);
 
-                        // start animation
-                        Animation transUpLeft = AnimationUtils.loadAnimation(RecordActivity.this, R.anim.transition_up_left);
-                        Animation transUpRight = AnimationUtils.loadAnimation(RecordActivity.this, R.anim.transition_up_right);
+                        AnimationUtil.startUpLeftShowAnimation(RecordActivity.this, scoreBtn);
+                        AnimationUtil.startUpRightAnimation(RecordActivity.this, missBtn);
 
-                        scoreBtn.startAnimation(transUpLeft);
-                        missBtn.startAnimation(transUpRight);
                         flag = true;
                         break;
                     default:
@@ -227,7 +294,9 @@ public class RecordActivity extends AppCompatActivity {
                         // all records store into filesystem
                         RecordBean recordBean = new RecordBean(player, teamOneName, teamTwoName,
                                 Integer.valueOf(teamOneScore.getText().toString()),
-                                Integer.valueOf(teamTwoScore.getText().toString()), singleRecordBeans);
+                                Integer.valueOf(teamTwoScore.getText().toString()),
+                                threePointScored, threePointMissed, twoPointScored, twoPointMissed, freeThrowScored, freeThrowMissed,
+                                rebound, steal, assist, singleRecordBeans);
 
                         FileUtil.storeRecord(recordBean);
                     }
@@ -246,6 +315,26 @@ public class RecordActivity extends AppCompatActivity {
 
 
         return true;
+    }
+
+
+    public void hideExtraFunctionBtns(){
+        AnimationUtil.startUpHideAnimation(RecordActivity.this, assistBtn);
+        AnimationUtil.startLeftHideAnimation(RecordActivity.this, reboundBtn);
+        AnimationUtil.startUpLeftHideAnimation(RecordActivity.this, stealBtn);
+
+        extraFunctionShow = false;
+    }
+
+    public void addSingleRecord(boolean scored, int tag, String description){
+        // store to singleRecordBeans
+        SingleRecordBean singleRecordBean = new SingleRecordBean();
+        singleRecordBean.setX(x);
+        singleRecordBean.setY(y);
+        singleRecordBean.setScored(scored);
+        singleRecordBean.setTag(tag);
+        singleRecordBean.setDescription(description);
+        singleRecordBeans.add(singleRecordBean);
     }
 
 }

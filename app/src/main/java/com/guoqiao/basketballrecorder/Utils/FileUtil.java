@@ -3,6 +3,7 @@ package com.guoqiao.basketballrecorder.Utils;
 import android.os.Environment;
 import android.util.Log;
 
+import com.google.gson.Gson;
 import com.guoqiao.basketballrecorder.Beans.HistoryBean;
 import com.guoqiao.basketballrecorder.Beans.RecordBean;
 import com.guoqiao.basketballrecorder.Beans.SingleRecordBean;
@@ -82,24 +83,12 @@ public class FileUtil {
             FileInputStream fileInputStream = new FileInputStream(file);
             InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            StringBuffer stringBuffer = new StringBuffer();
-
-            // read basic info
-            String playername = bufferedReader.readLine();
-            String teamOneName = bufferedReader.readLine();
-            int teamOneScore  = Integer.valueOf(bufferedReader.readLine());
-            String teamTwoName = bufferedReader.readLine();
-            int teamTwoScore  = Integer.valueOf(bufferedReader.readLine());
 
             // read records
-            ArrayList<SingleRecordBean> records = new ArrayList<>();
             String line;
             while((line = bufferedReader.readLine()) != null){
-                SingleRecordBean singleRecordBean = new SingleRecordBean();
-                records.add(singleRecordBean.stringToSingleRecordBean(line));
+                recordBean = GsonUtil.stringToRecordBean(line);
             }
-
-            recordBean = new RecordBean(playername, teamOneName, teamTwoName, teamOneScore, teamTwoScore, records);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -112,14 +101,7 @@ public class FileUtil {
     private static void writeFile(File file, RecordBean recordBean){
         try {
             FileOutputStream outputStream = new FileOutputStream(file);
-            outputStream.write((recordBean.getPlayer() + "\n").getBytes());
-            outputStream.write((recordBean.getTeamOneName() + "\n").getBytes());
-            outputStream.write((String.valueOf(recordBean.getTeamOneScore()) + "\n").getBytes());
-            outputStream.write((recordBean.getTeamTwoName() + "\n").getBytes());
-            outputStream.write((String.valueOf(recordBean.getTeamTwoScore()) + "\n").getBytes());
-            for (SingleRecordBean record : recordBean.getRecords()) {
-                outputStream.write((record.toString() + "\n").getBytes());
-            }
+            outputStream.write((recordBean.toString() + "\n").getBytes());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

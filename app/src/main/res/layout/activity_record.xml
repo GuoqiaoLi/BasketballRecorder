@@ -27,6 +27,45 @@
             android:layout_height="match_parent"
             android:src="@drawable/basketball_court"
             android:scaleType="fitXY"/>
+        <ImageView
+            android:id="@+id/extra_function"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/post"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="5dp"
+            android:layout_marginRight="5dp"/>
+        <ImageView
+            android:id="@+id/function_assist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/post"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:visibility="gone"
+            android:layout_marginBottom="70dp"
+            android:layout_marginRight="5dp"/>
+        <ImageView
+            android:id="@+id/function_steal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/post"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="50dp"
+            android:layout_marginRight="50dp"
+            android:visibility="gone"/>
+        <ImageView
+            android:id="@+id/function_rebound"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/post"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="5dp"
+            android:layout_marginRight="70dp"
+            android:visibility="gone"/>
     </RelativeLayout>
     <ListView
         android:id="@+id/records"

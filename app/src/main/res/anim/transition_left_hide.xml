@@ -3,13 +3,13 @@
     android:fillAfter="true">
     <translate
         android:interpolator="@android:interpolator/bounce"
-        android:fromXDelta="50"
-        android:fromYDelta="50"
+        android:fromXDelta="0"
+        android:fromYDelta="0"
         android:toYDelta="0"
-        android:toXDelta="0"
+        android:toXDelta="70"
         android:duration="300"/>
     <alpha
-        android:fromAlpha="0"
-        android:toAlpha="1"
+        android:fromAlpha="1"
+        android:toAlpha="0"
         android:duration="200"/>
 </set>

@@ -74,14 +74,24 @@ public class MainActivity extends AppCompatActivity {
         recordBeans = FileUtil.getRecords();
         adapter = new HistoryAdapter(recordBeans, this);
         historyListView.setAdapter(adapter);
+
+        historyListItemClick();
     }
 
     public void historyListItemClick(){
         historyListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+                Intent intent = new Intent(MainActivity.this, RecordDetailActivity.class);
+                intent.putExtra("recordBean", recordBeans.get(position).toString());
+                startActivity(intent);
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        init();
+        super.onResume();
     }
 }
