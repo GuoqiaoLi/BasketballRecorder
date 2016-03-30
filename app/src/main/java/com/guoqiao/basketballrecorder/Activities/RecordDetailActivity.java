@@ -1,7 +1,10 @@
 package com.guoqiao.basketballrecorder.Activities;
 
+import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.content.Intent;
 import android.media.Image;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -10,6 +13,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
@@ -19,6 +24,7 @@ import com.guoqiao.basketballrecorder.Adapter.RecordsAdapter;
 import com.guoqiao.basketballrecorder.Beans.RecordBean;
 import com.guoqiao.basketballrecorder.Beans.SingleRecordBean;
 import com.guoqiao.basketballrecorder.R;
+import com.guoqiao.basketballrecorder.Utils.Constant;
 import com.guoqiao.basketballrecorder.Utils.GsonUtil;
 
 import java.util.ArrayList;
@@ -96,6 +102,7 @@ public class RecordDetailActivity extends AppCompatActivity {
         return true;
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public void init(){
         recordBean = GsonUtil.stringToRecordBean(getIntent().getStringExtra("recordBean"));
 
@@ -147,6 +154,22 @@ public class RecordDetailActivity extends AppCompatActivity {
 
         // init graph view
         graphView = (RelativeLayout) findViewById(R.id.graph_view);
+        for(SingleRecordBean singleRecordBean : recordBean.getRecords()){
+            int tag = singleRecordBean.getTag();
+            if(tag == Constant.THREE_POINT || tag == Constant.TWO_POINT){
+                ImageView imageView= new ImageView(this);
+
+                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(20, 20);
+                params.setMargins((int)singleRecordBean.getX() - 10, (int)singleRecordBean.getY()*7/4 - 10, 0, 0);
+                imageView.setLayoutParams(params);
+                if(singleRecordBean.isScored())
+                    imageView.setBackgroundResource(R.drawable.circle);
+                else
+                    imageView.setBackgroundResource(R.drawable.close);
+
+                graphView.addView(imageView);
+            }
+        }
     }
 
 
