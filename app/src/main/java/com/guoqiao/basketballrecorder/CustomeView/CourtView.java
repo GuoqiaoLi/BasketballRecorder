@@ -55,7 +55,7 @@ public class CourtView extends ImageView implements View.OnTouchListener {
             case MotionEvent.ACTION_DOWN:
                 // create 3 circle button
                 LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                View scoreBtn = inflater.inflate(R.layout.circle_button, null, false);
+                View scoreBtn = inflater.inflate(R.layout.score_btn, null, false);
 
 
 

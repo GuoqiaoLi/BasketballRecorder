@@ -4,19 +4,20 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.guoqiao.basketballrecorder.Adapter.RecordsAdapter;
 import com.guoqiao.basketballrecorder.Beans.RecordBean;
@@ -33,6 +34,11 @@ public class RecordActivity extends AppCompatActivity {
     private String teamOneName;
     private String teamTwoName;
 
+    private int clickCount = 0;
+    private static final int DOUBLE_CLICK_DURATION = 250;
+    private long startTime;
+    private long duration;
+
     private int threePointScored = 0;
     private int threePointMissed = 0;
     private int twoPointScored = 0;
@@ -42,6 +48,7 @@ public class RecordActivity extends AppCompatActivity {
     private int rebound = 0;
     private int steal = 0;
     private int assist = 0;
+    private int tag;
 
     private ImageView functionBtn;
     private ImageView stealBtn;
@@ -93,6 +100,8 @@ public class RecordActivity extends AppCompatActivity {
     }
 
     public void init(){
+        startTime = System.currentTimeMillis();
+
         // intent variable
         player = getIntent().getStringExtra("player");
         teamOneName = getIntent().getStringExtra("teamOneName");
@@ -102,8 +111,8 @@ public class RecordActivity extends AppCompatActivity {
         basketballCourt = (ImageView) findViewById(R.id.basketball_court_view);
 
         LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        scoreBtn = inflater.inflate(R.layout.circle_button, null, false);
-        missBtn = inflater.inflate(R.layout.circle_button, null, false);
+        scoreBtn = inflater.inflate(R.layout.score_btn, null, false);
+        missBtn = inflater.inflate(R.layout.miss_btn, null, false);
         scoreBtn.setClickable(true);
         missBtn.setClickable(true);
 
@@ -128,18 +137,19 @@ public class RecordActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String description;
-                int tag;
 
                 // if it's a three point or two point
-                if(threePoint()){
+                if(tag == Constant.THREE_POINT){
                     description = Constant.THREE_POINT_SCORE_DESCRIPTION;
-                    tag = Constant.THREE_POINT;
                     threePointScored++;
                 }
-                else{
+                else if(tag == Constant.TWO_POINT){
                     description = Constant.TWO_POINT_SCORE_DESCRIPTION;
-                    tag = Constant.TWO_POINT;
                     twoPointScored++;
+                }
+                else{
+                    description = Constant.FREE_THROW_SCORE_DESCRIPTION;
+                    freeThrowScored++;
                 }
 
                 addSingleRecord(true, tag, description);
@@ -157,21 +167,21 @@ public class RecordActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String description;
-                int tag;
 
-                // if it's a three point or two point
-                if(threePoint()){
+                if(tag == Constant.THREE_POINT){
                     description = Constant.THREE_POINT_MISS_DESCRIPTION;
-                    tag = Constant.THREE_POINT;
                     threePointMissed++;
                 }
-                else{
+                else if(tag == Constant.TWO_POINT){
                     description = Constant.TWO_POINT_MISS_DESCRIPTION;
-                    tag = Constant.TWO_POINT;
                     twoPointMissed++;
                 }
+                else{
+                    description = Constant.FREE_THROW_MISS_DESCRIPTION;
+                    freeThrowMissed++;
+                }
 
-                addSingleRecord(true, tag, description);
+                addSingleRecord(false, tag, description);
 
                 records.add(description);
                 adapter.notifyDataSetChanged();
@@ -238,6 +248,57 @@ public class RecordActivity extends AppCompatActivity {
 
 
     public void courtOnTouch(){
+        basketballCourt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                duration = System.currentTimeMillis() - startTime;
+                startTime = System.currentTimeMillis();
+
+                if (duration > DOUBLE_CLICK_DURATION) {
+                    //Single click
+                    Toast.makeText(RecordActivity.this, String.valueOf(flag), Toast.LENGTH_SHORT).show();
+                    Log.e("MSG", String.valueOf(flag));
+
+                    if(basketballCourtWrapper.getChildCount() > 5){
+                        basketballCourtWrapper.removeView(scoreBtn);
+                        basketballCourtWrapper.removeView(missBtn);
+                    }
+                    tag = Constant.TWO_POINT;
+                    showScoreMissBtns();
+                } else {
+                    //Double click
+                    Toast.makeText(RecordActivity.this, String.valueOf(flag), Toast.LENGTH_SHORT).show();
+                    Log.e("MSG", String.valueOf(flag));
+
+                    if(basketballCourtWrapper.getChildCount() > 5){
+                        basketballCourtWrapper.removeView(scoreBtn);
+                        basketballCourtWrapper.removeView(missBtn);
+                    }
+                    tag = Constant.FREE_THROW;
+                    showScoreMissBtns();
+                    clickCount = 0;
+                }
+
+            }
+        });
+
+        basketballCourt.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Toast.makeText(RecordActivity.this, String.valueOf(flag), Toast.LENGTH_SHORT).show();
+                Log.e("MSG", String.valueOf(flag));
+
+                if (basketballCourtWrapper.getChildCount() > 5) {
+                    basketballCourtWrapper.removeView(scoreBtn);
+                    basketballCourtWrapper.removeView(missBtn);
+                }
+                tag = Constant.THREE_POINT;
+                showScoreMissBtns();
+                return true;
+            }
+        });
+
         basketballCourt.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -245,40 +306,36 @@ public class RecordActivity extends AppCompatActivity {
                     case MotionEvent.ACTION_DOWN:
                         x = (int) event.getX();
                         y = (int) event.getY();
-
-                        if (flag) {
-                            basketballCourtWrapper.removeView(scoreBtn);
-                            basketballCourtWrapper.removeView(missBtn);
-                            flag = false;
-                            break;
-                        }
-
-                        // add circle button
-                        RelativeLayout.LayoutParams paramsOne = new RelativeLayout.LayoutParams(50, 50);
-                        paramsOne.setMargins(x - 100, y - 80, 0, 0);
-                        RelativeLayout.LayoutParams paramsTwo = new RelativeLayout.LayoutParams(50, 50);
-                        paramsTwo.setMargins(x + 50, y - 80, 0, 0);
-
-                        scoreBtn.setLayoutParams(paramsOne);
-                        missBtn.setLayoutParams(paramsTwo);
-
-                        basketballCourtWrapper.addView(scoreBtn);
-                        basketballCourtWrapper.addView(missBtn);
-
-                        AnimationUtil.startUpLeftShowAnimation(RecordActivity.this, scoreBtn);
-                        AnimationUtil.startUpRightAnimation(RecordActivity.this, missBtn);
-
-                        flag = true;
                         break;
                     default:
                         break;
 
                 }
 
-                return true;
+                return false;
             }
         });
     }
+
+    public void showScoreMissBtns(){
+        // add circle button
+        RelativeLayout.LayoutParams paramsOne = new RelativeLayout.LayoutParams(50, 50);
+        paramsOne.setMargins(x - 100, y - 80, 0, 0);
+        RelativeLayout.LayoutParams paramsTwo = new RelativeLayout.LayoutParams(50, 50);
+        paramsTwo.setMargins(x + 50, y - 80, 0, 0);
+
+        scoreBtn.setLayoutParams(paramsOne);
+        missBtn.setLayoutParams(paramsTwo);
+
+        basketballCourtWrapper.addView(scoreBtn);
+        basketballCourtWrapper.addView(missBtn);
+
+        AnimationUtil.startUpLeftShowAnimation(RecordActivity.this, scoreBtn);
+        AnimationUtil.startUpRightAnimation(RecordActivity.this, missBtn);
+
+        flag = true;
+    }
+
 
     public void createFinishDialog(){
         View dialog = getLayoutInflater().inflate(R.layout.dialog_match_finish, null, false);
@@ -307,14 +364,6 @@ public class RecordActivity extends AppCompatActivity {
                         dialog.cancel();
                     }
                 }).show();
-    }
-
-    public boolean threePoint(){
-        // height and width of the screen
-
-
-
-        return true;
     }
 
 
