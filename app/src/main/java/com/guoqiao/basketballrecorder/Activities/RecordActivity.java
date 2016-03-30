@@ -254,26 +254,13 @@ public class RecordActivity extends AppCompatActivity {
                 duration = System.currentTimeMillis() - startTime;
                 startTime = System.currentTimeMillis();
 
-                if (duration > DOUBLE_CLICK_DURATION) {
-                    //Single click
 
-                    if (basketballCourtWrapper.getChildCount() > 5) {
-                        basketballCourtWrapper.removeView(scoreBtn);
+                if (basketballCourtWrapper.getChildCount() > 5) {
+                    basketballCourtWrapper.removeView(scoreBtn);
                         basketballCourtWrapper.removeView(missBtn);
-                    }
+                }
                     tag = Constant.TWO_POINT;
                     showScoreMissBtns();
-                } else {
-                    //Double click
-
-                    if (basketballCourtWrapper.getChildCount() > 5) {
-                        basketballCourtWrapper.removeView(scoreBtn);
-                        basketballCourtWrapper.removeView(missBtn);
-                    }
-                    tag = Constant.FREE_THROW;
-                    showScoreMissBtns();
-                    clickCount = 0;
-                }
 
             }
         });
@@ -297,9 +284,12 @@ public class RecordActivity extends AppCompatActivity {
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
+                        int H = v.getHeight();
+                        int W = v.getWidth();
                         x = (int) event.getX();
                         y = (int) event.getY();
-                        Toast.makeText(RecordActivity.this, "x: " + x + ", y: " + y, Toast.LENGTH_LONG).show();
+                        boolean three = ThreeOrNot(H,W,x,y);
+                        Log.e("MSG",String.valueOf(three));
                         break;
                     default:
                         break;
@@ -380,4 +370,16 @@ public class RecordActivity extends AppCompatActivity {
         singleRecordBeans.add(singleRecordBean);
     }
 
+    public boolean ThreeOrNot(int H, int W, int x, int y) {
+        if(y <= H/6.0) {
+            if(W/2.0 - 5.0/12*W <= x && W/2.0 + 5.0/12*W >= x) {
+                return false;
+            }
+        }
+        else {
+            double dis = Math.pow((x - W/2.0),2.0) + Math.pow((y - H/8.0),2);
+            return dis > Math.pow((5.0/12.0*W ),2);
+        }
+        return true;
+    }
 }
