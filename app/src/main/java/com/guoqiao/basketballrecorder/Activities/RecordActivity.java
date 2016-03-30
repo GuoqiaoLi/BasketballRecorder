@@ -232,14 +232,13 @@ public class RecordActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // if extra function btns not shown, show btns
-                if(!extraFunctionShow){
+                if (!extraFunctionShow) {
                     AnimationUtil.startUpShowAnimation(RecordActivity.this, assistBtn);
                     AnimationUtil.startLeftShowAnimation(RecordActivity.this, reboundBtn);
                     AnimationUtil.startUpLeftShowAnimation(RecordActivity.this, stealBtn);
 
                     extraFunctionShow = true;
-                }
-                else{
+                } else {
                     hideExtraFunctionBtns();
                 }
             }
@@ -257,10 +256,8 @@ public class RecordActivity extends AppCompatActivity {
 
                 if (duration > DOUBLE_CLICK_DURATION) {
                     //Single click
-                    Toast.makeText(RecordActivity.this, String.valueOf(flag), Toast.LENGTH_SHORT).show();
-                    Log.e("MSG", String.valueOf(flag));
 
-                    if(basketballCourtWrapper.getChildCount() > 5){
+                    if (basketballCourtWrapper.getChildCount() > 5) {
                         basketballCourtWrapper.removeView(scoreBtn);
                         basketballCourtWrapper.removeView(missBtn);
                     }
@@ -268,10 +265,8 @@ public class RecordActivity extends AppCompatActivity {
                     showScoreMissBtns();
                 } else {
                     //Double click
-                    Toast.makeText(RecordActivity.this, String.valueOf(flag), Toast.LENGTH_SHORT).show();
-                    Log.e("MSG", String.valueOf(flag));
 
-                    if(basketballCourtWrapper.getChildCount() > 5){
+                    if (basketballCourtWrapper.getChildCount() > 5) {
                         basketballCourtWrapper.removeView(scoreBtn);
                         basketballCourtWrapper.removeView(missBtn);
                     }
@@ -286,8 +281,6 @@ public class RecordActivity extends AppCompatActivity {
         basketballCourt.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                Toast.makeText(RecordActivity.this, String.valueOf(flag), Toast.LENGTH_SHORT).show();
-                Log.e("MSG", String.valueOf(flag));
 
                 if (basketballCourtWrapper.getChildCount() > 5) {
                     basketballCourtWrapper.removeView(scoreBtn);
@@ -306,6 +299,7 @@ public class RecordActivity extends AppCompatActivity {
                     case MotionEvent.ACTION_DOWN:
                         x = (int) event.getX();
                         y = (int) event.getY();
+                        Toast.makeText(RecordActivity.this, "x: " + x + ", y: " + y, Toast.LENGTH_LONG).show();
                         break;
                     default:
                         break;
