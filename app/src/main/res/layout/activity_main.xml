@@ -15,11 +15,18 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary" />
+        <TextView
+            android:id="@+id/welcome_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Welcome"
+            android:textSize="34sp"
+            android:gravity="center"/>
         <ListView
             android:id="@+id/record_history"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
+            android:layout_height="match_parent"
+            android:visibility="gone">
         </ListView>
     </LinearLayout>
 

@@ -561,18 +561,5 @@
 
     </ListView>
 
-    <!--graph view-->
-    <RelativeLayout
-        android:id="@+id/graph_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:visibility="gone">
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/basketball_court"
-            android:scaleType="fitXY"/>
-    </RelativeLayout>
 
 </RelativeLayout>

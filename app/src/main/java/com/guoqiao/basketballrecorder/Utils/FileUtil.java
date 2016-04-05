@@ -1,5 +1,6 @@
 package com.guoqiao.basketballrecorder.Utils;
 
+import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
@@ -26,23 +27,20 @@ import java.util.List;
  * The second line
  */
 public class FileUtil {
-    public static File createDir(String name){
-        File root = new File(Environment.getExternalStorageDirectory() + "/" + name);
+    private Context context;
 
-        if(!root.exists()){
-            if (root.mkdir()) {
-                Log.e("MSG","Directory is created!");
-            } else {
-                Log.e("MSG", "Failed to create directory!");
-            }
-        }
+    public FileUtil(Context context){
+        this.context = context;
+    }
 
+    public File createDir(){
+        File root = context.getDir("records", Context.MODE_PRIVATE);
         return root;
     }
 
 
-    public static ArrayList<RecordBean> getRecords(){
-        File root = createDir("Records");
+    public ArrayList<RecordBean> getRecords(){
+        File root = createDir();
         File files[] = root.listFiles();
         ArrayList<RecordBean> recordBeans = new ArrayList<>();
 
@@ -53,30 +51,23 @@ public class FileUtil {
         return recordBeans;
     }
 
-    public static void storeRecord(RecordBean recordBean){
-        // check if external storage is available or not
-        String state = Environment.getExternalStorageState();
-        Log.e("MSG", state);
-        if(Environment.MEDIA_MOUNTED.equals(state)){
+    public void storeRecord(RecordBean recordBean){
             Log.e("MSG","External Storage Available");
 
-            File root = createDir("Records");
+            File root = createDir();
 
             // get current time
             Time now = new Time();
             now.setToNow();
 
-            File newRecord = new File(root.getAbsolutePath() + "/" + now.toString().substring(0, 15) + ".txt");
+            File newRecord = new File(root, now.toString().substring(0, 15) + ".txt");
 
             // write records to file
             writeFile(newRecord, recordBean);
-        }
-        else{
-            Log.e("MSG","External Storage Not Available");
-        }
+
     }
 
-    private static RecordBean readFileAndSetRecord(File file){
+    private RecordBean readFileAndSetRecord(File file){
         RecordBean recordBean = null;
 
         try {
@@ -98,7 +89,7 @@ public class FileUtil {
         return recordBean;
     }
 
-    private static void writeFile(File file, RecordBean recordBean){
+    private void writeFile(File file, RecordBean recordBean){
         try {
             FileOutputStream outputStream = new FileOutputStream(file);
             outputStream.write((recordBean.toString() + "\n").getBytes());

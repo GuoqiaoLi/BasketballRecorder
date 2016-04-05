@@ -30,14 +30,12 @@ import com.guoqiao.basketballrecorder.Utils.FileUtil;
 import java.util.ArrayList;
 
 public class RecordActivity extends AppCompatActivity {
+    FileUtil fileUtil = new FileUtil(this);
+
     private String player;
     private String teamOneName;
     private String teamTwoName;
 
-    private int clickCount = 0;
-    private static final int DOUBLE_CLICK_DURATION = 250;
-    private long startTime;
-    private long duration;
 
     private int threePointScored = 0;
     private int threePointMissed = 0;
@@ -57,6 +55,7 @@ public class RecordActivity extends AppCompatActivity {
     private boolean extraFunctionShow = false;
 
     private boolean flag = false;
+    private boolean threePoint = false;
     private RelativeLayout basketballCourtWrapper;
     private ImageView basketballCourt;
     private View scoreBtn;
@@ -100,8 +99,6 @@ public class RecordActivity extends AppCompatActivity {
     }
 
     public void init(){
-        startTime = System.currentTimeMillis();
-
         // intent variable
         player = getIntent().getStringExtra("player");
         teamOneName = getIntent().getStringExtra("teamOneName");
@@ -251,16 +248,29 @@ public class RecordActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
-                duration = System.currentTimeMillis() - startTime;
-                startTime = System.currentTimeMillis();
+                Log.e("MSG", "Onclick called");
 
-
-                if (basketballCourtWrapper.getChildCount() > 5) {
-                    basketballCourtWrapper.removeView(scoreBtn);
-                        basketballCourtWrapper.removeView(missBtn);
+                if(extraFunctionShow){
+                    hideExtraFunctionBtns();
+                    extraFunctionShow = false;
                 }
-                    tag = Constant.TWO_POINT;
+
+                // if already btns show, remove the btns
+                if(flag){
+                    basketballCourtWrapper.removeView(scoreBtn);
+                    basketballCourtWrapper.removeView(missBtn);
+                    flag = false;
+                }
+                // else show btns
+                else {
+                    if(threePoint){
+                        tag = Constant.THREE_POINT;
+                    }
+                    else{
+                        tag = Constant.TWO_POINT;
+                    }
                     showScoreMissBtns();
+                }
 
             }
         });
@@ -269,11 +279,12 @@ public class RecordActivity extends AppCompatActivity {
             @Override
             public boolean onLongClick(View v) {
 
+                Log.e("MSG", "OnLongClick called");
                 if (basketballCourtWrapper.getChildCount() > 5) {
                     basketballCourtWrapper.removeView(scoreBtn);
                     basketballCourtWrapper.removeView(missBtn);
                 }
-                tag = Constant.THREE_POINT;
+                tag = Constant.FREE_THROW;
                 showScoreMissBtns();
                 return true;
             }
@@ -288,8 +299,7 @@ public class RecordActivity extends AppCompatActivity {
                         int W = v.getWidth();
                         x = (int) event.getX();
                         y = (int) event.getY();
-                        boolean three = ThreeOrNot(H,W,x,y);
-                        Log.e("MSG",String.valueOf(three));
+                        threePoint = ThreeOrNot(H, W, x, y);
                         break;
                     default:
                         break;
@@ -339,7 +349,9 @@ public class RecordActivity extends AppCompatActivity {
                                 threePointScored, threePointMissed, twoPointScored, twoPointMissed, freeThrowScored, freeThrowMissed,
                                 rebound, steal, assist, singleRecordBeans);
 
-                        FileUtil.storeRecord(recordBean);
+                        fileUtil.storeRecord(recordBean);
+
+                        finish();
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -381,5 +393,54 @@ public class RecordActivity extends AppCompatActivity {
             return dis > Math.pow((5.0/12.0*W ),2);
         }
         return true;
+    }
+
+    public void removeLastRecord(View view){
+        if(records.size() == 0)
+            return;
+
+        records.remove(records.size()-1);
+        adapter.notifyDataSetChanged();
+
+        // rollback to previous version
+        SingleRecordBean singleRecordBean = singleRecordBeans.get(singleRecordBeans.size()-1);
+        switch (singleRecordBean.getTag()){
+            case Constant.TWO_POINT:
+                if(singleRecordBean.isScored()){
+                    twoPointScored--;
+                }
+                else{
+                    twoPointMissed--;
+                }
+                break;
+            case Constant.THREE_POINT:
+                if(singleRecordBean.isScored()){
+                    threePointScored--;
+                }
+                else{
+                    threePointMissed--;
+                }
+                break;
+            case Constant.FREE_THROW:
+                if(singleRecordBean.isScored()){
+                    freeThrowScored--;
+                }
+                else{
+                    freeThrowMissed--;
+                }
+                break;
+            case Constant.STEAL:
+                steal--;
+                break;
+            case Constant.REBOUND:
+                rebound--;
+                break;
+            case Constant.ASSIST:
+                assist--;
+                break;
+            default:
+                break;
+        }
+        singleRecordBeans.remove(singleRecordBeans.size() - 1);
     }
 }

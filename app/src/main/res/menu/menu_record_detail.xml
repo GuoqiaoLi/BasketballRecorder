@@ -12,9 +12,4 @@
         android:orderInCategory="100"
         android:title="Text View"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/action_graph_view"
-        android:orderInCategory="100"
-        android:title="Graph View"
-        app:showAsAction="never" />
 </menu>
