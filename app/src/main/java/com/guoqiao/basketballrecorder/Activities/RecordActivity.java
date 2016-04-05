@@ -3,6 +3,8 @@ package com.guoqiao.basketballrecorder.Activities;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -36,7 +38,6 @@ public class RecordActivity extends AppCompatActivity {
     private String teamOneName;
     private String teamTwoName;
 
-
     private int threePointScored = 0;
     private int threePointMissed = 0;
     private int twoPointScored = 0;
@@ -47,6 +48,8 @@ public class RecordActivity extends AppCompatActivity {
     private int steal = 0;
     private int assist = 0;
     private int tag;
+    private int teamOneScore = 0;
+    private int teamTwoScore = 0;
 
     private ImageView functionBtn;
     private ImageView stealBtn;
@@ -333,8 +336,8 @@ public class RecordActivity extends AppCompatActivity {
 
     public void createFinishDialog(){
         View dialog = getLayoutInflater().inflate(R.layout.dialog_match_finish, null, false);
-        final EditText teamOneScore = (EditText) dialog.findViewById(R.id.team_one_score);
-        final EditText teamTwoScore = (EditText) dialog.findViewById(R.id.team_two_score);
+        final EditText teamOneScoreEditText = (EditText) dialog.findViewById(R.id.team_one_score);
+        final EditText teamTwoScoreEditText = (EditText) dialog.findViewById(R.id.team_two_score);
 
         new AlertDialog.Builder(this)
                 .setTitle("Game Over")
@@ -342,16 +345,43 @@ public class RecordActivity extends AppCompatActivity {
                 .setPositiveButton("Finish", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        teamOneScore = Integer.valueOf(teamOneScoreEditText.getText().toString());
+                        teamTwoScore = Integer.valueOf(teamTwoScoreEditText.getText().toString());
+
                         // all records store into filesystem
                         RecordBean recordBean = new RecordBean(player, teamOneName, teamTwoName,
-                                Integer.valueOf(teamOneScore.getText().toString()),
-                                Integer.valueOf(teamTwoScore.getText().toString()),
+                                teamOneScore,
+                                teamTwoScore,
                                 threePointScored, threePointMissed, twoPointScored, twoPointMissed, freeThrowScored, freeThrowMissed,
                                 rebound, steal, assist, singleRecordBeans);
 
                         fileUtil.storeRecord(recordBean);
 
                         finish();
+                    }
+                })
+                .setNeutralButton("Send Email", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        View emailDialog = getLayoutInflater().inflate(R.layout.dialog_send_email, null);
+
+                        EditText emailAddr = (EditText) emailDialog.findViewById(R.id.email_address);
+                        final String email = emailAddr.getText().toString();
+
+                        new AlertDialog.Builder(RecordActivity.this)
+                                .setView(emailDialog)
+                                .setPositiveButton("Send", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        sendEmail(email);
+                                    }
+                                })
+                                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.cancel();
+                                    }
+                                }).show();
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -442,5 +472,30 @@ public class RecordActivity extends AppCompatActivity {
                 break;
         }
         singleRecordBeans.remove(singleRecordBeans.size() - 1);
+    }
+
+    public String constructEmailContent(){
+        String ret = "This is feedback from BasketballRecorder";
+        return ret;
+    }
+
+    public void sendEmail(String emailAddr){
+        String [] TO = {emailAddr};
+        Intent emailIntent = new Intent(Intent.ACTION_SEND);
+        String content = constructEmailContent();
+
+        emailIntent.setData(Uri.parse("mailto:"));
+        emailIntent.setType("text/plain");
+        emailIntent.putExtra(Intent.EXTRA_EMAIL, TO);
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "BasketballRecorder Feedback");
+        emailIntent.putExtra(Intent.EXTRA_TEXT, content);
+
+        try {
+            startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+            finish();
+        }
+        catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(RecordActivity.this, "There is no email client installed.", Toast.LENGTH_SHORT).show();
+        }
     }
 }

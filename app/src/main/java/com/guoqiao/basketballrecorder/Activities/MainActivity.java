@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         else if(id == R.id.action_new_record){
-
+            newMatchDialog();
         }
 
         return super.onOptionsItemSelected(item);
@@ -110,9 +110,9 @@ public class MainActivity extends AppCompatActivity {
     public void newMatchDialog(){
         View newMatch = getLayoutInflater().inflate(R.layout.dialog_new_match, null);
 
-        final EditText playerName = (EditText) findViewById(R.id.player_name);
-        final EditText teamOneName = (EditText) findViewById(R.id.team_one_name);
-        final EditText teamTwoName = (EditText) findViewById(R.id.team_two_name);
+        final EditText playerName = (EditText) newMatch.findViewById(R.id.player_name);
+        final EditText teamOneName = (EditText) newMatch.findViewById(R.id.team_one_name);
+        final EditText teamTwoName = (EditText) newMatch.findViewById(R.id.team_two_name);
 
         new AlertDialog.Builder(this).setTitle("New Match")
                 .setView(newMatch)
@@ -131,6 +131,6 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
                     }
-                });
+                }).show();
     }
 }
