@@ -375,7 +375,7 @@ public class RecordActivity extends AppCompatActivity {
                                 .setPositiveButton("Send", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        sendEmail(email);
+                                        sendEmail();
                                     }
                                 })
                                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -483,14 +483,12 @@ public class RecordActivity extends AppCompatActivity {
         return ret;
     }
 
-    public void sendEmail(String emailAddr){
-        String [] TO = {emailAddr};
+    public void sendEmail(){
         Intent emailIntent = new Intent(Intent.ACTION_SEND);
         String content = constructEmailContent();
 
         emailIntent.setData(Uri.parse("mailto:"));
         emailIntent.setType("text/plain");
-        emailIntent.putExtra(Intent.EXTRA_EMAIL, TO);
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, "BasketballRecorder Feedback");
         emailIntent.putExtra(Intent.EXTRA_TEXT, content);
 
