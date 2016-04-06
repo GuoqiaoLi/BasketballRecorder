@@ -3,11 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".Activities.RecordActivity">
     <item
-        android:id="@+id/action_help"
-        android:icon="@drawable/info"
-        android:title="info"
-        app:showAsAction="ifRoom"/>
-    <item
         android:id="@+id/action_finish"
         android:title="Finish"
         app:showAsAction="ifRoom"/>

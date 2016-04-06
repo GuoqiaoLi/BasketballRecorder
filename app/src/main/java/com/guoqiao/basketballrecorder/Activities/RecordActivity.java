@@ -237,6 +237,8 @@ public class RecordActivity extends AppCompatActivity {
                     AnimationUtil.startLeftShowAnimation(RecordActivity.this, reboundBtn);
                     AnimationUtil.startUpLeftShowAnimation(RecordActivity.this, stealBtn);
 
+                    AnimationUtil.startRotateRightAnimation(RecordActivity.this, functionBtn);
+
                     extraFunctionShow = true;
                 } else {
                     hideExtraFunctionBtns();
@@ -397,6 +399,8 @@ public class RecordActivity extends AppCompatActivity {
         AnimationUtil.startUpHideAnimation(RecordActivity.this, assistBtn);
         AnimationUtil.startLeftHideAnimation(RecordActivity.this, reboundBtn);
         AnimationUtil.startUpLeftHideAnimation(RecordActivity.this, stealBtn);
+
+        AnimationUtil.startRotateLeftAnimation(RecordActivity.this, functionBtn);
 
         extraFunctionShow = false;
     }

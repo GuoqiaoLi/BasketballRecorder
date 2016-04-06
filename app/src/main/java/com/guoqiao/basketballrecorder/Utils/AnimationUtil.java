@@ -54,6 +54,15 @@ public class AnimationUtil {
         view.startAnimation(animation);
     }
 
+    public static void startRotateLeftAnimation(Context context, View view){
+        Animation animation = AnimationUtils.loadAnimation(context, R.anim.rotate_left_90_degree);
+        view.startAnimation(animation);
+    }
+
+    public static void startRotateRightAnimation(Context context, View view){
+        Animation animation = AnimationUtils.loadAnimation(context, R.anim.rotate_right_90_degree);
+        view.startAnimation(animation);
+    }
 
     private static void goneAfterAnimation(Animation animation, final View view){
         animation.setAnimationListener(new Animation.AnimationListener() {
